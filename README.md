@@ -60,7 +60,7 @@ several columns were removed to ensure only meaningful and usable features were 
 ### Outlier Analysis
 
 - Outlier analysis of the target variable (length_of_stay) shows a highly skewed distribution with most patients staying under 7 days, but a small fraction of admissions extending beyond 30 days (up to 120). These extreme cases are clinically valid and represent high-severity conditions rather than errors. For this project, we retain all values but apply a log transformation during modeling to reduce skewness and lessen the impact of extreme outliers on model performance.
-<img src="images/los_dist.png" width="700"/>
+<img src="images/los_dist (1).png" width="700"/>
 
 ### Preprocessing/Feature Engineering
 
