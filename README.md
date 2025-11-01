@@ -223,6 +223,25 @@ The dummy regressor, which always predicts the mean LOS (~6.5 days), still provi
 
 The graph confirms that admission type, patient disposition, and severity level are the dominant drivers of LOS, aligning with clinical intuition. Trauma patients, extreme severity cases, and hospice transfers require extended hospital resources, while elective or newborn admissions are associated with shorter, planned stays. This demonstrates that the models are identifying meaningful and clinically interpretable patterns rather than noise.
 
+### Model Comparisions
+Compared Dummy, Linear regression, Ridge regression, Lasso, KNN, SVR, Decision Tree, Random Forest and Gradient Boosting models. 
+
+<img src="images/models_comparsion.png" width="750"/>
+
+Top Performers
+- Lasso Regression performed best, achieving the lowest test RMSE (0.69) and highest R² (0.226), confirming that regularization improved generalization by reducing overfitting.
+
+- Ridge and Linear Regression produced nearly identical results, indicating that the relationship between features and log(LOS) is mostly linear and stable.
+
+- Tree-based models (Random Forest, Gradient Boosting) achieved decent but slightly lower R² values (~0.18), suggesting that nonlinear interactions offer limited additional predictive power for this dataset.
+
+- SVR performed competitively (R² ≈ 0.21), showing some ability to capture complex boundaries but not outperforming simpler models.
+
+- KNN and Decision Tree models lagged, likely due to sensitivity to noise and lack of regularization.
+
+- The Dummy baseline confirmed that all models achieved substantial improvements over naive mean predictions (R² ≈ −0.001).
+
+- Overall, regularized linear models (Lasso/Ridge) balance accuracy, interpretability, and stability, making them the optimal choice for hospital LOS prediction in this dataset.
 
 ## Next Steps & Recommendations
 After evaluating the baseline dummy and linear regression models, the results show limited predictive power. To improve performance, the next phase will explore non-linear and ensemble models that can capture more complex patterns in the data:
