@@ -1,13 +1,30 @@
 # Capstone--Hospital-Stay-Duration-Analysis
 
-## Overview
+## Problem Statment 
+Efficient hospital resource management depends heavily on accurately estimating how long patients will remain admitted. Hospital Length of Stay (LOS) is a key performance indicator that directly impacts bed availability, staffing schedules, operational costs, and patient flow efficiency. However, LOS is difficult to predict because it depends on multiple interacting factors such as severity of illness, risk of mortality, admission type, discharge disposition, and patient demographics.
+
+Hospitals traditionally rely on historical averages or clinical judgment to anticipate LOS, but these methods fail to account for patient-level variability and often lead to bottlenecks in care delivery, delayed discharges, or inefficient utilization of beds and staff.
+
+This project aims to address that challenge by developing a machine learning model that predicts the expected hospital length of stay for each patient at the time of admission. By analyzing available demographic, administrative, and clinical features (e.g., age group, admission type, severity, mortality risk, payment typology, and patient disposition), the goal is to identify patterns associated with prolonged hospitalization.
+
+The outcome is a predictive framework that can help healthcare administrators forecast bed demand, optimize patient throughput, and improve discharge planning, ultimately supporting better operational decision-making and patient care quality.
 
 This project analyzes a comprehensive hospital dataset from New York State to understand and predict the length of patient hospital stays. It involves exploratory data analysis, feature engineering, and predictive modeling using regression techniques.
 
-Dataset Description: 
+## Model Outcomes or Predictions
+
+This project applies a supervised machine learning regression approach to predict the hospital length of stay (LOS) for individual patients based on demographic and clinical factors available at admission. The expected model output is a continuous numerical value representing the predicted number of hospital days, expressed as both log-transformed LOS (for modeling stability) and actual days (for interpretation).
+
+The analysis compared several regression algorithms — including Linear Regression, Ridge, Lasso, ElasticNet, Decision Tree, Random Forest, Support Vector Regression (SVR), and Gradient Boosting Regressor. Among these, regularized linear models (Ridge and Lasso) achieved the most reliable performance, with a test RMSE ≈ 0.69 (log scale) and R² ≈ 0.22, indicating that the model explains approximately 22% of the variation in LOS.
+
+Predictions show that patients with higher illness severity, trauma or emergency admissions, and post-acute discharge dispositions (e.g., skilled nursing, hospice) tend to have significantly longer stays. In contrast, elective or home discharges are associated with shorter LOS. While the model underestimates rare, extreme LOS cases, it provides consistent and interpretable predictions for most hospitalizations.
+
+These outcomes confirm that LOS patterns in this dataset are largely linear and additive, making Ridge regression the most appropriate model for this problem. The resulting model can be leveraged to support hospital bed planning, staffing forecasts, and early discharge coordination by identifying patients likely to experience extended stays.
+
+## Dataset Description: 
 The dataset contains records of hospital stays including patient demographics, admission details, clinical severity scores, financial charges, and outcomes.
 
-Dataset
+## Dataset - https://health.data.ny.gov/resource/tg3i-cinn.csv
 - **Rows:** 1,000 (sample)  
 - **Columns:** 33 originally → reduced to 22 after cleaning
   
@@ -96,7 +113,6 @@ several columns were removed to ensure only meaningful and usable features were 
 ##### Severity of Illness Code (numeric 1–4):
 - LOS increases stepwise with the severity code.
 - Acts as an ordinal variable and aligns well with the categorical severity labels.
-- 
 
 
 #### 3. Categorical Features Distrubution
@@ -226,7 +242,7 @@ The graph confirms that admission type, patient disposition, and severity level 
 
 
 ## Model Comparisions
-Compared Dummy, Linear regression, Ridge regression, Lasso, KNN, SVR, Decision Tree, Random Forest and Gradient Boosting models. 
+Compared Dummy, Linear regression, Ridge regression, ElasticNet, Lasso, KNN, SVR, Decision Tree, Random Forest and Gradient Boosting models. 
 
 <img src="images/models_compare.png" width="750"/>
 
@@ -268,6 +284,9 @@ Tried to improve the model by using the best value of alpha. -> Worked by didn't
 
 The Ridge model shows a stable performance plateau between α = 5 and α = 15, indicating that moderate regularization provides the best tradeoff between bias and variance. Model performance does not meaningfully change within this range, confirming robustness to α selection.
 
+## Model Evalulation Conclusion 
+Regularized linear models (Lasso and Ridge) provided the best balance of accuracy, stability, and interpretability. While Gradient Boosting and Random Forest captured some complexity, they did not significantly outperform linear models due to the dataset’s categorical structure. The results demonstrate the feasibility of machine learning–based LOS prediction for improving hospital capacity management, discharge coordination, and overall operational efficiency. Among them, the Ridge Regression model proved to be the most stable, showing consistent residual patterns and reliable performance across folds, making it a strong candidate for practical hospital implementation.
+
 ## Feature Selection using Ridge Model 
 
 <img src="images/ridge_coef.png" width="750"/>
@@ -291,7 +310,13 @@ The Ridge model shows a stable performance plateau between α = 5 and α = 15, i
 
 ## Summary 
 
-## Business Recommendations 
+This project aimed to predict hospital length of stay (LOS) using demographic, administrative, and clinical severity data to improve hospital efficiency and discharge planning. After preprocessing and log-transforming LOS, feature selection using Ridge regression coefficients identified key predictors: severity of illness (Extreme +0.46, Minor –0.51), patient disposition (Skilled Nursing +0.33, Hospice +0.22), risk of mortality (Extreme +0.28), and admission type (Trauma +0.19, Elective –0.15).
+
+Several machine learning models were evaluated, including Linear, Ridge, Lasso, ElasticNet, Gradient Boosting, and Random Forest. Regularized linear models (Ridge and Lasso) achieved the best results (R² ≈ 0.22, RMSE ≈ 0.69), balancing accuracy, interpretability, and stability. The Ridge model proved most consistent across folds and residuals.
+
+Overall, the study demonstrates that LOS can be effectively predicted using structured admission and severity data, supporting capacity planning, discharge coordination, and hospital resource optimization.
+
+## Business Recommendations/ Next Steps
 - Prioritize high-severity and emergency admissions for early discharge planning.
   - Since severity of illness and admission type are the strongest predictors of longer stays, hospitals should flag these patients at admission for proactive case management and resource allocation.
 - Enhance capacity and staffing forecasts based on predicted LOS.
