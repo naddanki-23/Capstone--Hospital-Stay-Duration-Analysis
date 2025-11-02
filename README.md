@@ -1,7 +1,8 @@
-# Capstone--Hospital-Stay-Duration-Analysis
+# Capstone- Hospital Stay Duration Analysis
 
-## Problem Statment 
-Efficient hospital resource management depends heavily on accurately estimating how long patients will remain admitted. Hospital Length of Stay (LOS) is a key performance indicator that directly impacts bed availability, staffing schedules, operational costs, and patient flow efficiency. However, LOS is difficult to predict because it depends on multiple interacting factors such as severity of illness, risk of mortality, admission type, discharge disposition, and patient demographics.
+## Problem Statement 
+
+Efficient hospital resource management depends heavily on accurately estimating how long patients will remain admitted. **Hospital Length of Stay (LOS)** is a key performance indicator that directly impacts bed availability, staffing schedules, operational costs, and patient flow efficiency. However, LOS is difficult to predict because it depends on multiple interacting factors such as severity of illness, risk of mortality, admission type, discharge disposition, and patient demographics.
 
 Hospitals traditionally rely on historical averages or clinical judgment to anticipate LOS, but these methods fail to account for patient-level variability and often lead to bottlenecks in care delivery, delayed discharges, or inefficient utilization of beds and staff.
 
@@ -30,6 +31,9 @@ The dataset contains records of hospital stays including patient demographics, a
   
 ## Notebooks
 - [link to colab notebook code](https://colab.research.google.com/drive/1Bvc1XTSsyqYRLFSvz2UCU42tIPxt9cJB?usp=sharing)
+
+## Link to Slideshow
+- [link to slideshow](https://docs.google.com/presentation/d/18fOyBuPTGTmkI9wYlLkfjqepJIUtH2Hkl4v41agPvD8/edit?usp=sharing)
 ## Data Description 
 ### Feature Groups
 
