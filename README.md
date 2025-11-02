@@ -223,33 +223,99 @@ The dummy regressor, which always predicts the mean LOS (~6.5 days), still provi
 
 The graph confirms that admission type, patient disposition, and severity level are the dominant drivers of LOS, aligning with clinical intuition. Trauma patients, extreme severity cases, and hospice transfers require extended hospital resources, while elective or newborn admissions are associated with shorter, planned stays. This demonstrates that the models are identifying meaningful and clinically interpretable patterns rather than noise.
 
-### Model Comparisions
+
+
+## Model Comparisions
 Compared Dummy, Linear regression, Ridge regression, Lasso, KNN, SVR, Decision Tree, Random Forest and Gradient Boosting models. 
 
-<img src="images/models_comparsion.png" width="750"/>
+<img src="images/models_compare.png" width="750"/>
 
-Top Performers
-- Lasso Regression performed best, achieving the lowest test RMSE (0.69) and highest R² (0.226), confirming that regularization improved generalization by reducing overfitting.
+Best RMSE: Ridge (0.690), Lasso (0.690), ElasticNet (0.691) → essentially tied
+Best R²: Lasso (0.226) — very slightly ahead
+Consistency: CV and Test RMSE values are close → good generalization
 
-- Ridge and Linear Regression produced nearly identical results, indicating that the relationship between features and log(LOS) is mostly linear and stable.
+Interpretation:
+Regularized linear models (Ridge, Lasso, ElasticNet) perform best, suggesting the relationship between features (age group, severity, risk, etc.) and log(LOS) is mostly linear with limited benefit from non-linear or tree-based methods.
 
-- Tree-based models (Random Forest, Gradient Boosting) achieved decent but slightly lower R² values (~0.18), suggesting that nonlinear interactions offer limited additional predictive power for this dataset.
+Business-Level Summary (Hospital Stay Duration): The models achieve consistent RMSE ≈ 0.69 (log-days), indicating typical prediction errors of 4–5 days in actual stay length.
+Ridge, Lasso, and ElasticNet generalize best, implying stable relationships between severity, admission type, and LOS.
+Complex ensemble models do not improve performance, suggesting linear effects dominate and data quantity/variability may limit non-linear gains.
 
-- SVR performed competitively (R² ≈ 0.21), showing some ability to capture complex boundaries but not outperforming simpler models.
+### Lasso Vs. Ridge Vs. ElasticNet 
 
-- KNN and Decision Tree models lagged, likely due to sensitivity to noise and lack of regularization.
+<img src="images/lasso,ridge,elasticnet.png" width="750"/>
 
-- The Dummy baseline confirmed that all models achieved substantial improvements over naive mean predictions (R² ≈ −0.001).
+Each panel shows how well the model’s predicted hospital length of stay (in days) matches the actual stay.
+Most points cluster tightly between 0–10 days, reflecting the skewed distribution (most hospital stays are short).
+A few scattered points above the line show underprediction (model predicted shorter stays than actual).
+An 𝑅 2 around 0.22–0.23 means the models explain ~22–23 % of the variance in LOS — typical for healthcare data with high variability.
+Overall, the three models (Lasso, Ridge, ElasticNet) perform nearly identically, confirming the relationship between predictors and LOS is largely linear.
 
-- Overall, regularized linear models (Lasso/Ridge) balance accuracy, interpretability, and stability, making them the optimal choice for hospital LOS prediction in this dataset.
+<img src="images/residuals.png" width="750"/>
 
-## Next Steps & Recommendations
-After evaluating the baseline dummy and linear regression models, the results show limited predictive power. To improve performance, the next phase will explore non-linear and ensemble models that can capture more complex patterns in the data:
+The residual plots indicate that all three regularized linear models produce unbiased predictions centered around zero, with a modest right-skew suggesting occasional underprediction of extended hospital stays. This reflects the inherent variability in patient recovery durations and discharge processes. Ridge regression displays the most balanced residual spread, supporting its selection as the most stable and well-calibrated model. Thus will be using ridge regression. 
 
-Tree-Based Models
-- Decision Tree Regressor: Simple, interpretable, can reveal threshold rules (e.g., trauma admissions → long LOS).
-- Random Forest Regressor: Reduces variance by averaging multiple trees; typically improves RMSE/MAE.
-- Gradient Boosting (e.g., XGBoost, LightGBM): Handles non-linear interactions and skewed outcomes very well; often top performers for LOS.
+## Improving the Model -> Ridge 
+Tried to improve the model by using the best value of alpha. -> Worked by didn't help that much with improving the model. Why? 
+- Ridge tuning only adjusts how much to shrink coefficients, not the form of the relationship. model already found the sweet spot between bias and variance — the flat region in the curve shows that performance has plateaued.
+- Tuning worked but it just confirmed stabilization and not improvement
+
+<img src="images/ridge_curve.png" width="750"/>
+- The x-axis (log scale) shows your Ridge penalty alpha.
+- The y-axis shows the 5-fold average RMSE (lower = better).
+- The shaded area is the ±1 standard deviation band across folds.
+- The red dashed line marks your best α ≈ 8.9.
+
+The Ridge model shows a stable performance plateau between α = 5 and α = 15, indicating that moderate regularization provides the best tradeoff between bias and variance. Model performance does not meaningfully change within this range, confirming robustness to α selection.
+
+## Feature Selection using Ridge Model 
+
+<img src="images/ridge_coef.png" width="750"/>
+
+### Interpretation of Each Feature 
+- apr_severity_of_illness_Minor (-0.43)	Patients with minor severity illnesses tend to have shorter hospital stays — they’re easier to treat and recover faster.	
+- patient_disposition_Left Against Medical Advice (-0.39)	Leaving against medical advice (AMA) leads to shorter recorded stays, since patients discharge themselves early, often before treatment is complete.	
+- apr_severity_of_illness_Extreme (+0.36)	Extreme severity strongly increases LOS, as these patients need more intensive care and longer recovery.	
+- patient_disposition_Skilled Nursing Home (+0.34)	Patients discharged to a skilled nursing facility had longer stays, indicating more complex cases or post-acute needs.	
+- apr_risk_of_mortality_Extreme (+0.32)	Higher mortality risk correlates with longer stays, as these patients require more monitoring and resources.	
+- patient_disposition_Hospice – Medical Facility (+0.23)	Hospice transfers indicate terminal or chronic conditions → longer hospital stays before transition to hospice care.	
+- type_of_admission_Trauma (+0.20)	Trauma admissions significantly extend LOS due to multi-system injuries and surgical recovery time.	
+- race_Multi-racial (+0.18)	Slightly longer LOS; could reflect demographic variation, small sample size, or socio-economic effects.	
+- patient_disposition_Expired (-0.18)	Patients who expired (passed away) during hospitalization often had shorter LOS, possibly from acute, rapidly fatal events.	
+- payment_typology_1_Self-Pay (-0.18)	Self-pay patients tend to leave sooner, potentially due to financial concerns or limited insurance coverage.	
+- patient_disposition_Another Type Not Listed (-0.17)	Ambiguous discharge categories show slightly shorter stays; possibly incomplete or miscoded discharges.	
+- age_group_18 to 29 (+0.16)	Young adults (18–29) have slightly longer LOS than baseline (perhaps more trauma or maternity-related admissions).	
+- apr_risk_of_mortality_Moderate (-0.16)	Moderate-risk patients typically recover faster than severe cases → shorter stays.	
+- payment_typology_1_Miscellaneous/Other (+0.15)	Minor positive correlation — may reflect small, mixed-category payers.
+- race_White (-0.15)	Slightly shorter LOS for White patients; often reflects access or utilization patterns rather than clinical differences.
+
+## Summary 
+
+## Business Recommendations 
+- Prioritize high-severity and emergency admissions for early discharge planning.
+  - Since severity of illness and admission type are the strongest predictors of longer stays, hospitals should flag these patients at admission for proactive case management and resource allocation.
+- Enhance capacity and staffing forecasts based on predicted LOS.
+   - Predictive LOS models can support scheduling of staff, beds, and ICU resources—especially in high-volume emergency departments—to reduce bottlenecks and boarding times.
+- Use LOS predictions to optimize post-acute care coordination.
+  - Patients likely to require skilled nursing or rehab transfers can be identified earlier, enabling smoother handoffs and reducing discharge delays.
+- Monitor and reduce variability among high-risk groups
+  - Outliers (e.g., extreme severity or mortality risk patients) contribute disproportionately to bed occupancy; tracking these cases can improve throughput and cost efficiency.
+- Incorporate predictive insights into administrative dashboards.
+  - Integrating LOS forecasts into hospital management systems allows real-time decision-making for admissions, transfers, and discharges.
+ 
+## Technical Recommendations
+- Expand feature set with richer clinical and operational data.
+  - Include continuous variables such as exact age, lab results, comorbidity scores, ICU hours, and procedure counts to capture nonlinear patterns missed by the current categorical dataset.
+- Test advanced ensemble models.
+  - Explore XGBoost, LightGBM, or Stacking Regressors (e.g., Ridge + Gradient Boosting) to leverage nonlinear interactions and potentially improve R² beyond 0.30.
+- Implement explainability techniques.
+  - Use SHAP or LIME for model interpretation, helping clinicians and administrators understand how each feature drives predicted LOS.
+- Deploy and validate model in production.
+  - Develop a simple web-based dashboard or API to integrate predictions into EMR or hospital workflow, followed by continuous model retraining as new data arrive.
+
+
+## Contact and Further Information 
+Nikita Addanki - nikita@cloudfeds.com
 
 
 
